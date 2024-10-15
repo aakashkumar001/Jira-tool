@@ -1,3 +1,5 @@
+"use client"
+
 import { FcGoogle } from "react-icons/fc";
 import { FaGithub} from "react-icons/fa";
 import {z} from "zod";
@@ -9,6 +11,8 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Form, FormControl, FormField, FormItem, FormMessage } from "@/components/ui/form";
 import Link from "next/link";
+import { loginSchema } from "../schemas";
+import { useLogin } from "../api/use-login";
 
 
 const formSchema = z.object({
@@ -17,7 +21,9 @@ const formSchema = z.object({
 })
 
 export const SignInCard = () => {
-     const form = useForm<z.infer<typeof formSchema>>({
+    const {mutate,isPending} = useLogin();
+
+     const form = useForm<z.infer<typeof loginSchema>>({
       resolver:zodResolver(formSchema),
       defaultValues:{
         email:"",
@@ -26,8 +32,8 @@ export const SignInCard = () => {
      })
 
 
-    const onSubmit = (values:z.infer<typeof formSchema>) => {
-      console.log({values});
+    const onSubmit = (values:z.infer<typeof loginSchema>) => {
+      mutate({json: values})
     }
 
 
@@ -75,7 +81,7 @@ export const SignInCard = () => {
               </FormItem>
              )}
           />
-          <Button className="w-full" disabled={false} size="lg">
+          <Button disabled={isPending} className="w-full" size="lg">
             Login
           </Button>
         </form>
@@ -89,7 +95,7 @@ export const SignInCard = () => {
           className="w-full"
           variant="secondary"
           size="lg"
-          disabled={false}
+          disabled={isPending}
         >
           <FcGoogle className="mr-2 size-5" />
           Login with Google
@@ -98,7 +104,7 @@ export const SignInCard = () => {
           className="w-full"
           variant="secondary"
           size="lg"
-          disabled={false}
+          disabled={isPending}
         >
           <FaGithub className="mr-2 size-5" />
           Login with Github
@@ -118,3 +124,5 @@ export const SignInCard = () => {
     </Card>
   );
 };
+
+

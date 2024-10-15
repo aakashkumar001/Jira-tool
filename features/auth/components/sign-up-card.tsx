@@ -1,3 +1,5 @@
+"use client"
+
 import { FcGoogle } from "react-icons/fc";
 import { FaGithub } from "react-icons/fa";
 
@@ -22,16 +24,17 @@ import {
   FormItem,
   FormMessage,
 } from "@/components/ui/form";
+import { loginSchema, registerSchema } from "../schemas";
+import { useRegister } from "../api/use-register";
 
-const formSchema = z.object({
-  name: z.string().trim().min(3, "Minimum 3 characters required"),
-  email: z.string().trim().email(),
-  password: z.string().min(1, "Minimum 8 characters required"),
-});
+
 
 export const SignUpCard = () => {
-  const form = useForm<z.infer<typeof formSchema>>({
-    resolver: zodResolver(formSchema),
+
+    const {mutate,isPending} = useRegister()  
+
+  const form = useForm<z.infer<typeof registerSchema>>({
+    resolver: zodResolver(registerSchema),
     defaultValues: {
       name: "",
       email: "",
@@ -39,8 +42,8 @@ export const SignUpCard = () => {
     },
   });
 
-  const onSubmit = (values: z.infer<typeof formSchema>) => {
-    console.log({ values });
+  const onSubmit = (values: z.infer<typeof registerSchema>) => {
+    mutate({json:values});
   };
 
   return (
@@ -112,8 +115,8 @@ export const SignUpCard = () => {
                 </FormItem>
               )}
             />
-            <Button className="w-full" disabled={false} size="lg">
-              Login
+            <Button className="w-full" disabled={isPending} size="lg">
+              Sign Up
             </Button>
           </form>
         </Form>
@@ -126,7 +129,7 @@ export const SignUpCard = () => {
           className="w-full"
           variant="secondary"
           size="lg"
-          disabled={false}
+          disabled={isPending}
         >
           <FcGoogle className="mr-2 size-5" />
           Login with Google
@@ -135,7 +138,7 @@ export const SignUpCard = () => {
           className="w-full"
           variant="secondary"
           size="lg"
-          disabled={false}
+          disabled={isPending}
         >
           <FaGithub className="mr-2 size-5" />
           Login with Github
